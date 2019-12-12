@@ -1,0 +1,1 @@
+(assert (animal-is duck))
