@@ -1,4 +1,4 @@
-# ASSIGNMENT I (due before Xmas holidays):
+# ASSIGNMENT I 
 
 Using CLIPS, create your own knowledge-base system for a problem of
 your choice where rule-based knowledge represenation is suitable.
