@@ -1,6 +1,5 @@
-------------------------------------------------------------------------
 ASSIGNMENT I (due before Xmas holidays):
-----------------------------------------
+
 Using CLIPS, create your own knowledge-base system for a problem of
 your choice where rule-based knowledge represenation is suitable.
 It has to support reasoning under uncertainty using a formal methodology.
@@ -17,7 +16,6 @@ Your assignment should include:
 in your system
 - Your problem's description and some example runs
 - Your CLIPS code with comments, if required
-------------------------------------------------------------------------
 
 
 The CLIPS code and documentation is downloadable from:
