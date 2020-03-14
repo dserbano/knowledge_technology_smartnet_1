@@ -12,12 +12,7 @@ in your system
 - Your CLIPS code with comments, if required
 
 
-The CLIPS code and documentation is downloadable from:
-http://www.clipsrules.net/
-Recommended version for downloading is: CLIPS 6.3
-Recommended documentation to consult is:
+The CLIPS code and documentation is downloadable from http://www.clipsrules.net/.
+Recommended version for downloading is CLIPS 6.3 and the documentation to consult is mostly:
 - User’s Guide: smooth introduction of CLIPS
 - Basic Programming Guide: for a reference when detailed information
-for a CLIPS contruct or command is needed
-Of less use for your assignment is: Advanced Programming Guide
-The Interfaces Guide won't be needed probably at all.
