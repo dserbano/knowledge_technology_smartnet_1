@@ -1,4 +1,3 @@
-
 ;;;======================================================
 ;;;   Wine Expert Sample Problem
 ;;;
@@ -386,7 +385,3 @@
    (not (attribute (name wine)))
    =>
    (printout t t))
-
-
-
-

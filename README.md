@@ -1,6 +1,6 @@
 # ASSIGNMENT I 
 
-Using CLIPS, create knowledge-base system for a problem of choice where rule-based knowledge represenation is suitable. It has to support reasoning under uncertainty using a formal methodology:
+Using CLIPS, create a knowledge-base system for a problem of choice where rule-based knowledge represenation is suitable. It has to support reasoning under uncertainty using a formal methodology:
 
 1) decide how to implement the uncertainty methodology into CLIPS
 2) create a CLIPS rule base to represent the problem's knowledge base and experiment by consult it into CLIPS in order to ensure that it properly functions
