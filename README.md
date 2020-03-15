@@ -16,3 +16,4 @@ The CLIPS code and documentation is downloadable from http://www.clipsrules.net/
 Recommended version for downloading is CLIPS 6.3 and the documentation to consult is mostly:
 - User’s Guide: smooth introduction of CLIPS
 - Basic Programming Guide: for a reference when detailed information
+- https://www.csie.ntu.edu.tw/~sylee/courses/clips/bpg/top.html
