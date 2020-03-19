@@ -1,6 +1,6 @@
 ;;;======================================================
 ;;;     JOBEX: The JOB EXpert system.
-;;;     This helps you select a job based on your attitudes
+;;;     This helps you select a job based on who you are
 ;;;
 ;;;     CLIPS Version 6.31 
 ;;;
@@ -11,17 +11,20 @@
 ;;  DEFFUNCTIONS *
 ;;****************
 
-(defglobal ?*x* = 0)
-
 (deffunction next-questionnaire (?questionnaire ?allowed-values)
-   (printout t ?questionnaire)
+   (printout t ?questionnaire crlf)
+   (printout t "accepted answer " ?allowed-values ": ")
    (bind ?answer (read))
+   (printout t crlf)
    (if (lexemep ?answer) then (bind ?answer (lowcase ?answer)))
    (while (not (member ?answer ?allowed-values)) do
-      (printout t ?questionnaire)
+      (printout t ?questionnaire crlf)
+      (printout t "accepted answer " ?allowed-values ": ")
       (bind ?answer (read))
+      (printout t crlf)
       (if (lexemep ?answer) then (bind ?answer (lowcase ?answer))))
    ?answer)
+
 
 ;;*****************
 ;;  INIT 
@@ -30,6 +33,9 @@
 (defrule start
   (declare (salience 10000))
   =>
+  (printout t "" crlf)
+  (printout t "The JOBEX career quiz will help you decide the sort of jobs that will suit you best:" crlf)
+  (printout t "" crlf)
   (set-fact-duplication TRUE))
 
 (deftemplate a-fact
@@ -85,8 +91,7 @@
    =>
    (modify ?f (already-asked TRUE))
    (assert (a-fact (name ?the-fact)
-                   (cf (next-questionnaire ?the-questionnaire ?valid-answers))))
-   (bind ?*x* (+ ?*x* 1)))
+                   (cf (next-questionnaire ?the-questionnaire ?valid-answers)))))
 
 (deffacts questionnaire-facts
   (questionnaire (a-fact f1)
@@ -122,123 +127,153 @@
   (or
     (a-fact (name f1) (cf ?cf1))
     (a-fact (name likes-sports) (cf ?cf1)))
-  (test (>= ?cf1 0.5))
   =>
-  (assert (a-fact (name is-social) (cf (* 0.8 ?cf1))))))
-  (assert (a-fact (name is-active) (cf (* 0.6 ?cf1))))))
-  (assert (a-fact (name likes-outdoor-activities) (cf (* 0.8 ?cf1))))))
-  (assert (a-fact (name likes-spending) (cf (* 0.8 ?cf1))))))
+  (if (>= ?cf1 0.5) 
+       then 
+      (assert (a-fact (name is-social) (cf (* 0.8 ?cf1))))
+      (assert (a-fact (name is-active) (cf (* 0.6 ?cf1))))
+      (assert (a-fact (name likes-outdoor-activities) (cf (* 0.8 ?cf1))))
+      (assert (a-fact (name likes-spending) (cf (* 0.8 ?cf1))))
+       else (if (<= ?cf1 -0.5)
+                then (assert (a-fact (name is-introvert) (cf (* 0.6 ?cf1))))
+                     (assert (a-fact (name likes-indoor-activities) (cf (* 0.9 ?cf1)))))))
+
 
 (defrule rule2
-  (or
-    (a-fact (name f1) (cf ?cf1))
-    (a-fact (name is-follower) (cf ?cf1)))
-  (test (<= ?cf1 -0.5))
-  =>
-  (assert (a-fact (name is-introvert) (cf (* 0.6 ?cf1))))))
-  (assert (a-fact (name likes-indoor-activities) (cf (* 0.9 ?cf1))))))
-
-(defrule rule3
   (and 
       (a-fact (name f2) (cf ?cf1))
       (a-fact (name f3) (cf ?cf2)))
   (test (>= ?cf1 0.5))
   (test (>= ?cf2 0.5))
   =>
-  (assert (a-fact (name likes-sports) (cf (* 0.8 (max ?cf1 ?cf2)))))
-  (assert (a-fact (name is-social) (cf (* 0.6 (max ?cf1 ?cf2)))))
-  (assert (a-fact (name is-leader) (cf (* 0.7 (max ?cf1 ?cf2)))))
-  (assert (a-fact (name likes-teaching) (cf (* 0.7 (max ?cf1 ?cf2))))))
+  (if (>= ?cf1 0.5) 
+       then 
+      (assert (a-fact (name likes-sports) (cf (* 0.8 (max ?cf1 ?cf2)))))
+      (assert (a-fact (name is-social) (cf (* 0.6 (max ?cf1 ?cf2)))))
+      (assert (a-fact (name is-leader) (cf (* 0.7 (max ?cf1 ?cf2)))))
+      (assert (a-fact (name likes-teaching) (cf (* 0.7 (max ?cf1 ?cf2)))))
+      else (if (<= ?cf1 -0.5)
+                then
+                (assert (a-fact (name is-introvert) (cf (* 0.6 (max ?cf1 ?cf2)))))
+                (assert (a-fact (name is-follower) (cf (* 0.7 (max ?cf1 ?cf2))))))))
 
-(defrule rule4
-  (and 
-      (a-fact (name f2) (cf ?cf1))
-      (a-fact (name f3) (cf ?cf2)))
-  (test (<= ?cf1 -0.5))
-  (test (<= ?cf2 -0.5))
-  =>
-  (assert (a-fact (name is-introvert) (cf (* 0.6 (max ?cf1 ?cf2)))))
-  (assert (a-fact (name is-follower) (cf (* 0.7 (max ?cf1 ?cf2))))))
-
-(defrule rule5
+(defrule rule3
   (or 
       (a-fact (name f4) (cf ?cf1))
       (a-fact (name is-social) (cf ?cf1)))
-  (test (>= ?cf1 0.5))
   =>
-  (assert (a-fact (name is-introvert) (cf (* 0.9 ?cf1))))
-  (assert (a-fact (name is-follower) (cf (* 0.7 ?cf1)))))
+  (if (>= ?cf1 0.5) 
+       then 
+      (assert (a-fact (name is-introvert) (cf (* 0.9 ?cf1))))
+      (assert (a-fact (name is-follower) (cf (* 0.7 ?cf1))))))
 
-(defrule rule6
+
+(defrule rule4
   (a-fact (name good-with-computers) (cf ?cf1))
-  (test (>= ?cf1 0.5))
   =>
-  (assert (a-fact (name likes-indoor-activities) (cf (* 0.9 ?cf1))))
-  (assert (a-fact (name is-follower) (cf (* 0.7 ?cf1)))))
+  (if (>= ?cf1 0.5) 
+       then 
+      (assert (a-fact (name likes-indoor-activities) (cf (* 0.9 ?cf1))))
+      (assert (a-fact (name is-follower) (cf (* 0.7 ?cf1))))))
 
-(defrule rule7
+(defrule rule5
   (a-fact (name f6) (cf ?cf1))
   (test (<= ?cf1 -0.5))
   =>
   (assert (a-fact (name likes-studying) (cf (* 0.9 ?cf1))))
   (assert (a-fact (name likes-teaching) (cf (* 0.7 ?cf1)))))
 
-(defrule rule8
+(defrule rule6
   (a-fact (name f7) (cf ?cf1))
   (test (>= ?cf1 0.5))
   =>
   (assert (a-fact (name likes-studying) (cf (* 0.9 ?cf1))))
   (assert (a-fact (name likes-teaching) (cf (* 0.7 ?cf1)))))
 
-(defrule rule9
+(defrule rule7
   (a-fact (name f8) (cf ?cf1))
   (test (>= ?cf1 0.5))
   =>
   (assert (a-fact (name is-follower) (cf (* 0.9 ?cf1)))))
 
 
-(defrule rule10
-  (a-fact (name f8) (cf ?cf1))
-  (test (<= ?cf1 -0.5))
-  =>
-  (assert (a-fact (name is-leader) (cf (* 0.8 ?cf1)))))
-
-
 ;;************************
 ;;* JOB SELECTION RULES
 ;;************************
 
+(defrule print-results
+  (a-fact (name f1) (cf ?cf1))
+  =>
+  (printout  t "The recommended jobs for you are:" crlf)
+  (printout  t crlf)
+  (assert (finished)))
 
-(defrule jobsel1
-  (test (>= ?*x* 7))
+(defrule job-selection-rule-1
+  (finished)
   (a-fact (name is-leader) (cf ?cf1))
   (test (>= ?cf1 0.4))
   (test (>= ?cf1 0.4))
   =>
-  (printout  t "MANAGER" "0.6" crlf))
+  (printout  t "Manager with cf " "0.6" crlf)
+  (printout  t crlf))
 
-(defrule jobsel2
-  (test (>= ?*x* 7))
+(defrule job-selection-rule-2
+  (finished)
   (and
     (a-fact (name is-leader) (cf ?cf1))
     (a-fact (name likes-studying) (cf ?cf2))
     (a-fact (name likes-teaching) (cf ?cf3)))
   (test (>= ?cf1 0.4))
   =>
-  (printout  t "PROFESSOR" "0.6" crlf))
+  (printout  t "Professor with cf " "0.6" crlf)
+  (printout  t crlf))
 
-(defrule jobsel3
-  (test (>= ?*x* 7))
+(defrule job-selection-rule-3
+  (finished)
   (and
     (a-fact (name is-leader) (cf ?cf1))
     (a-fact (name likes-studying) (cf ?cf2))
     (a-fact (name likes-teaching) (cf ?cf3)))
   (test (>= ?cf1 0.4))
   =>
-  (printout  t "HR MANAGER" "0.6" crlf))
+  (printout  t "HR Manager with cf " "0.6" crlf)
+  (printout  t crlf))
 
-(defrule jobsel4
-  (test (>= ?*x* 7))
+(defrule job-selection-rule-4
+  (finished)
+  (and
+    (a-fact (name is-leader) (cf ?cf1))
+    (a-fact (name likes-studying) (cf ?cf2))
+    (a-fact (name likes-teaching) (cf ?cf3)))
+  (test (>= ?cf1 0.4))
+  =>
+  (printout  t "Computer Programmer with cf " "0.6" crlf)
+  (printout  t crlf))
+
+(defrule job-selection-rule-5
+  (finished)
+  (and
+    (a-fact (name is-leader) (cf ?cf1))
+    (a-fact (name likes-studying) (cf ?cf2))
+    (a-fact (name likes-teaching) (cf ?cf3)))
+  (test (>= ?cf1 0.4))
+  =>
+  (printout  t "Mathematician with cf " "0.6" crlf)
+  (printout  t crlf))
+
+(defrule job-selection-rule-6
+  (finished)
+  (and
+    (a-fact (name is-leader) (cf ?cf1))
+    (a-fact (name likes-studying) (cf ?cf2))
+    (a-fact (name likes-teaching) (cf ?cf3)))
+  (test (>= ?cf1 0.4))
+  =>
+  (printout  t "Architect with cf " "0.6" crlf)
+  (printout  t crlf))
+
+(defrule job-selection-rule-7
+  (finished)
 
   (and
     (a-fact (name is-leader) (cf ?cf1))
@@ -246,38 +281,6 @@
     (a-fact (name likes-teaching) (cf ?cf3)))
   (test (>= ?cf1 0.4))
   =>
-  (printout  t "COMPUTER PROGRAMMER" "0.6" crlf))
-
-(defrule jobsel5
-  (test (>= ?*x* 7))
-
-  (and
-    (a-fact (name is-leader) (cf ?cf1))
-    (a-fact (name likes-studying) (cf ?cf2))
-    (a-fact (name likes-teaching) (cf ?cf3)))
-  (test (>= ?cf1 0.4))
-  =>
-  (printout  t "MATHEMATICIAN" "0.6" crlf))
-
-(defrule jobsel6
-  (test (>= ?*x* 7))
-
-  (and
-    (a-fact (name is-leader) (cf ?cf1))
-    (a-fact (name likes-studying) (cf ?cf2))
-    (a-fact (name likes-teaching) (cf ?cf3)))
-  (test (>= ?cf1 0.4))
-  =>
-  (printout  t "ARCHITECT" "0.6" crlf))
-
-(defrule jobsel7
-  (test (>= ?*x* 7))
-
-  (and
-    (a-fact (name is-leader) (cf ?cf1))
-    (a-fact (name likes-studying) (cf ?cf2))
-    (a-fact (name likes-teaching) (cf ?cf3)))
-  (test (>= ?cf1 0.4))
-  =>
-  (printout  t "CONSTRUCTION WORKER" "0.6" crlf))
+  (printout  t "Construction Worker with cf " "0.6" crlf)
+  (printout  t crlf))
 
