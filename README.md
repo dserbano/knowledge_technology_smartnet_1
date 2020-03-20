@@ -1,7 +1,5 @@
 # JOBEX
 
-The assignment is to create a knowledge-base system with support to reasoning under uncertainty using CLIPS 6.3. 
-
 I implemented an intelligent system that acts as a career advisor. For every user it produces a set of jobs that are best suited for him/her, based on the answers he/she will give to a questionnaire.
 Every answer generates 1 or more facts. Every fact has an associated numeric value between -1 and 1 called certainty factor (CF). Through a repeated application of modus ponens the system infers the best set of jobs, also with an associated certainty factor (CF). 
 
